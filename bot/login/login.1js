@@ -1,5 +1,18 @@
 // set bash title
-process.stdout.write("\x1b]2;Goat Bot V2 - Fca By Mahi68x\x1b\x5c");
+process.stdout.write("\x1b]2;Goat Bot V3 - Fca By Mahi68x\x1b\x5c");
+
+// --- RENDER PORT FIX By Cid Kageno ---
+const http = require('http');
+const renderPort = process.env.PORT || 3000;
+const keepAliveServer = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('GoatBot V3 is running on Render!');
+});
+keepAliveServer.listen(renderPort, '0.0.0.0', () => {
+    console.log(`Render Keep-Alive Server listening on port ${renderPort}`);
+});
+
+
 const defaultRequire = require;
 
 function decode(text) {
@@ -64,24 +77,29 @@ function centerText(text, length) {
 
 // logo
 const titles = [
-	[
-		"██████╗  ██████╗  █████╗ ████████╗    ██╗   ██╗██████╗",
-		"██╔════╝ ██╔═══██╗██╔══██╗╚══██╔══╝    ██║   ██║╚════██╗",
-		"██║  ███╗██║   ██║███████║   ██║       ██║   ██║ █████╔╝",
-		"██║   ██║██║   ██║██╔══██║   ██║       ╚██╗ ██╔╝██╔═══╝",
-		"╚██████╔╝╚██████╔╝██║  ██║   ██║        ╚████╔╝ ███████╗",
-		"╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝         ╚═══╝  ╚══════╝"
-	],
-	[
-		"█▀▀ █▀█ ▄▀█ ▀█▀  █▄▄ █▀█ ▀█▀  █░█ ▀█",
-		"█▄█ █▄█ █▀█ ░█░  █▄█ █▄█ ░█░  ▀▄▀ █▄"
-	],
-	[
-		"G O A T B O T  V 2 @" + currentVersion
-	],
-	[
-		"GOATBOT V2"
-	]
+    [
+        "     ██████╗  ██╗  ██████╗ ",
+        "     ██╔═══╝  ██║  ██╔══ ██╗",
+        "     ██║       ██║  ██║    ██║",
+        "     ██║       ██║  ██║   ██║",
+        "     ╚██████╗ ██║  ██████╔╝",
+        "      ╚═════╝ ╚═╝  ╚═════╝ ",
+        "      ",
+        "    █▄▀ ▄▀█ █▀▀ █▀▀ █▄░█ █▀█",
+        "    █░█ █▀█ █▄█ ██▄ █░▀█ █▄█",
+        "    ",
+        "      === I AM ATOMIC ==="
+    ],
+    [
+        "CID KAGENO - SHADOW",
+        "=== I AM ATOMIC ==="
+    ],
+    [
+        "SHADOW GARDEN @" + currentVersion
+    ],
+    [
+        "SHADOW"
+    ]
 ];
 const maxWidth = process.stdout.columns;
 const title = maxWidth > 58 ?
@@ -98,7 +116,7 @@ for (const text of title) {
 	const textColor = gradient("#FA8BFF", "#2BD2FF", "#2BFF88")(text);
 	centerText(textColor, text.length);
 }
-let subTitle = `GoatBot V2@${currentVersion}- A simple Bot chat messenger use personal account`;
+let subTitle = `GoatBot V3@${currentVersion}- A simple Bot chat messenger use personal account`;
 const subTitleArray = [];
 if (subTitle.length > maxWidth) {
 	while (subTitle.length > maxWidth) {
@@ -112,9 +130,12 @@ if (subTitle.length > maxWidth) {
 else {
 	subTitleArray.push(subTitle);
 }
-const author = ("Created by NTKhang with ♡");
+const author = ("Created by NTKhang, Enhance by Cid Kageno");
 const srcUrl = ("Source code: https://github.com/ntkhang03/Goat-Bot-V2");
 const fakeRelease = ("ALL VERSIONS NOT RELEASED HERE ARE FAKE");
+
+// --- REMOVED BROKEN APP.LISTEN BLOCK HERE ---
+
 for (const t of subTitleArray) {
 	const textColor2 = gradient("#9F98E8", "#AFF6CF")(t);
 	centerText(textColor2, t.length);
@@ -1084,16 +1105,24 @@ async function startBot(loginWithEmail) {
 			global.GoatBot.callBackListen = callBackListen;
 			// ——————————————————— UPTIME ——————————————————— //
 			if (global.GoatBot.config.serverUptime.enable == true && !global.GoatBot.config.dashBoard?.enable && !global.serverUptimeRunning) {
-				const http = require('http');
-				const express = require('express');
-				const app = express();
-				const server = http.createServer(app);
-				const { data: html } = await axios.get("https://raw.githubusercontent.com/ntkhang03/resources-goat-bot/master/homepage/home.html");
-				const PORT = global.GoatBot.config.dashBoard?.port || (!isNaN(global.GoatBot.config.serverUptime.port) && global.GoatBot.config.serverUptime.port) || 3001;
-				app.get('/', (req, res) => res.send(html));
-				app.get('/uptime', global.responseUptimeCurrent);
-				let nameUpTime;
+				// NOTE: We already started a Keep-Alive server at the top, so we can skip or modify this part
+				// to avoid port conflicts if it tries to use the same port.
+				// However, if the bot uses a different internal logic for uptime, we leave it be
+				// but ensure it doesn't crash the main process.
 				try {
+					const http = require('http');
+					const express = require('express');
+					const app = express();
+					const server = http.createServer(app);
+					const { data: html } = await axios.get("https://raw.githubusercontent.com/ntkhang03/resources-goat-bot/master/homepage/home.html");
+					
+					// We use a different port (e.g. 3001) for this internal dashboard if PORT is taken by our Keep-Alive server
+					const PORT = 3001; 
+					
+					app.get('/', (req, res) => res.send(html));
+					app.get('/uptime', global.responseUptimeCurrent);
+					let nameUpTime;
+					
 					nameUpTime = `https://${process.env.REPL_OWNER ?
 						`${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` :
 						process.env.API_SERVER_EXTERNAL == "https://api.glitch.com" ?
@@ -1159,3 +1188,4 @@ async function startBot(loginWithEmail) {
 
 global.GoatBot.reLoginBot = startBot;
 startBot();
+ 
